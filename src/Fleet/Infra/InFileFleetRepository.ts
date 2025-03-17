@@ -7,9 +7,10 @@ import {fileURLToPath} from "node:url";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+const ROOT_DIR = path.resolve(__dirname, "../../../features/database/");
 
 export class InFileFleetRepository implements FleetRepository {
-    private static readonly FILE_PATH = path.join(__dirname, "fleets");
+    private static readonly FILE_PATH = path.join(ROOT_DIR, "fleets");
 
     save(fleet: Fleet): void {
         fs.writeFileSync(this.fileName(fleet.getId().getValue()), JSON.stringify(fleet));

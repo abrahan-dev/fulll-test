@@ -6,9 +6,10 @@ import {fileURLToPath} from "node:url";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+const ROOT_DIR = path.resolve(__dirname, "../../../../../features/database/");
 
 export class InFileEventBus implements EventBus {
-    private static readonly FILE_PATH = path.join(__dirname, "events");
+    private static readonly FILE_PATH = path.join(ROOT_DIR, "events");
 
     constructor() {
         if (!fs.existsSync(InFileEventBus.FILE_PATH)) {
