@@ -1,5 +1,5 @@
 import { expect, test, describe } from 'bun:test'
-import {fizzBuzz} from "./fizzbuzz.ts";
+import {Fizzbuzz} from "../../src/Fizzbuzz/Fizzbuzz.ts";
 
 describe('Fizzbuzz', () => {
     test.each([
@@ -9,7 +9,7 @@ describe('Fizzbuzz', () => {
     ])(
         'convert integers to strings: %p to %p',
         (number: number, result: string) => {
-            expect(fizzBuzz(number)).toBe(result)
+            expect(Fizzbuzz(number)).toBe(result)
         }
     )
 
@@ -20,7 +20,7 @@ describe('Fizzbuzz', () => {
     ])(
         'convert multiples of 3 to "Fizz": %p to %p',
         (number: number, result: string) => {
-            expect(fizzBuzz(number)).toBe(result)
+            expect(Fizzbuzz(number)).toBe(result)
         }
     )
 
@@ -30,7 +30,7 @@ describe('Fizzbuzz', () => {
     ])(
         'convert multiples of 5 to "Buzz": %p to %p',
         (number: number, result: string) => {
-            expect(fizzBuzz(number)).toBe(result)
+            expect(Fizzbuzz(number)).toBe(result)
         }
     )
 
@@ -53,7 +53,7 @@ describe('Fizzbuzz', () => {
     ])(
         'convert range from 1 to 15: %p to %p',
         (number: number, result: string) => {
-            expect(fizzBuzz(number)).toBe(result)
+            expect(Fizzbuzz(number)).toBe(result)
         }
     )
 
@@ -68,7 +68,7 @@ describe('Fizzbuzz', () => {
     ])(
         'throws an error for non-integer or non-number values: %p',
         (input: any) => {
-            expect(() => fizzBuzz(input)).toThrowError('You must provide an integer number');
+            expect(() => Fizzbuzz(input)).toThrowError('You must provide an integer number');
         }
     )
 })

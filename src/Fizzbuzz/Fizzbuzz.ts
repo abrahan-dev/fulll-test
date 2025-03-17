@@ -1,4 +1,4 @@
-export function fizzBuzz(number: number) {
+export function Fizzbuzz(number: number) {
     ensureIsNumber(number);
 
     const isFizz = number % 3 === 0

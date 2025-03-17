@@ -3,12 +3,24 @@
   "type": "module",
   "private": true,
   "devDependencies": {
-    "@types/bun": "latest"
+    "@cucumber/pretty-formatter": "^1.0.1",
+    "@types/bun": "latest",
+    "@cucumber/cucumber": "^10.8.0",
+    "ts-node": "^10.9.2",
+    "@types/node": "^20.14.9"
+  },
+  "engines": {
+    "node": "22"
   },
   "peerDependencies": {
     "typescript": "^5"
   },
   "scripts": {
-    "test": "bun test fizzbuzz"
+    "test": "bun test tests/Fizzbuzz",
+    "build": "tsc",
+    "test:bdd": "cucumber-js --format @cucumber/pretty-formatter"
+  },
+  "dependencies": {
+    "tsx": "^4.19.3"
   }
 }
