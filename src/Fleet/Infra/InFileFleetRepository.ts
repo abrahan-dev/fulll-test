@@ -29,7 +29,8 @@ export class InFileFleetRepository implements FleetRepository {
         return Fleet.fromPrimitives({
             id: fleetData.id.value,
             name: fleetData.name.value,
-            vehicles: fleetData.vehicles.map((vehicle: {value: string}) => vehicle.value)
+            vehicles: fleetData.vehicles.map((vehicle: {value: string}) => vehicle.value),
+            userId: fleetData.userId.value,
         })
     }
 

@@ -1,7 +1,8 @@
 export class CreateFleetCommand {
     constructor(
         private readonly id: string,
-        private readonly name: string
+        private readonly name: string,
+        private readonly userId: string,
     ) {}
 
     getId(): string {
@@ -10,5 +11,9 @@ export class CreateFleetCommand {
 
     getName(): string {
         return this.name;
+    }
+
+    getUserId(): string {
+        return this.userId;
     }
 }

@@ -5,20 +5,22 @@ import {FleetId} from "./ValueObject/FleetId.ts";
 import {FleetName} from "./ValueObject/FleetName.ts";
 import {VehicleId} from "../../Vehicle/Domain/ValueObject/VehicleId.ts";
 import {VehicleAlreadyRegisteredInFleet} from "./VehicleAlreadyRegisteredInFleet.ts";
+import {UserId} from "../../User/Domain/ValueObject/UserId.ts";
 
 export class Fleet extends AggregateRoot {
     constructor(
         private readonly id: FleetId,
         private name: FleetName,
-        private vehicles: VehicleId[] = []
+        private vehicles: VehicleId[] = [],
+        private userId: UserId
     ) {
         super();
     }
 
-    static create(id: FleetId, name: FleetName): Fleet {
-        const fleet = new Fleet(id, name, []);
+    static create(id: FleetId, name: FleetName, userId: UserId): Fleet {
+        const fleet = new Fleet(id, name, [], userId);
 
-        fleet.record(new FleetCreatedDomainEvent(id.getValue(), name.getValue()));
+        fleet.record(new FleetCreatedDomainEvent(id.getValue(), name.getValue(), userId.getValue()));
 
         return fleet;
     }
@@ -29,6 +31,10 @@ export class Fleet extends AggregateRoot {
 
     getName(): FleetName {
         return this.name;
+    }
+
+    getUserId(): UserId {
+        return this.userId;
     }
 
     rename(newName: FleetName): void {
@@ -48,11 +54,12 @@ export class Fleet extends AggregateRoot {
         this.record(new VehicleRegisteredInFleetDomainEvent(vehicleId.getValue(), this.id.getValue()));
     }
 
-    static fromPrimitives(primitives: {id: string, name: string, vehicles: string[]}): Fleet {
+    static fromPrimitives(primitives: {id: string, name: string, vehicles: string[], userId: string}): Fleet {
         return new Fleet(
             new FleetId(primitives.id),
             new FleetName(primitives.name),
-            primitives.vehicles.map((vehicleId) => new VehicleId(vehicleId))
+            primitives.vehicles.map((vehicleId) => new VehicleId(vehicleId)),
+            new UserId(primitives.userId)
         );
     }
 }

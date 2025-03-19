@@ -3,6 +3,7 @@ import type {EventBus} from "../../../shared/Domain/Bus/Event/EventBus.ts";
 import type {FleetId} from "../../Domain/ValueObject/FleetId.ts";
 import type {FleetName} from "../../Domain/ValueObject/FleetName.ts";
 import {Fleet} from "../../Domain/Fleet.ts";
+import type {UserId} from "../../../User/Domain/ValueObject/UserId.ts";
 
 export class FleetCreator {
     constructor(
@@ -10,8 +11,8 @@ export class FleetCreator {
         private readonly bus: EventBus
     ) {}
 
-    run(id: FleetId, name: FleetName): void {
-        const fleet = Fleet.create(id, name);
+    run(id: FleetId, name: FleetName, userId: UserId): void {
+        const fleet = Fleet.create(id, name, userId);
 
         this.repository.save(fleet);
         this.bus.publish(fleet.pullDomainEvents());

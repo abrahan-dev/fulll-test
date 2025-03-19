@@ -24,10 +24,15 @@ import {ParkVehicleCommandHandler} from "../../../src/Vehicle/App/Park/ParkVehic
 import {FindVehicleQuery} from "../../../src/Vehicle/App/Find/FindVehicleQuery.ts";
 import {FindVehicleQueryHandler} from "../../../src/Vehicle/App/Find/FindVehicleQueryHandler.ts";
 import {VehicleAlreadyParkedAtLocation} from "../../../src/Vehicle/Domain/VehicleAlreadyParkedAtLocation.ts";
+import {CreateUserCommand} from "../../../src/User/App/Create/CreateUserCommand.ts";
+import {UserCreator} from "../../../src/User/App/Create/UserCreator.ts";
+import {InFileUserRepository} from "../../../src/User/Infra/InFileUserRepository.ts";
+import {CreateUserCommandHandler} from "../../../src/User/App/Create/CreateUserCommandHandler.ts";
 
 export class FleetTestContext {
     constructor(
         public fleetId: string | null = null,
+        public userId: string | null = null,
         public vehicleId: string | null = null,
         public vehicleIdAlreadyRegistered: boolean = false,
         public vehicleAlreadyParkedAtLocation: boolean = false,
@@ -36,12 +41,14 @@ export class FleetTestContext {
     ) {}
 
     createFleet(fleetName: string): void {
+        const userId = this.createUser();
         const fleetId = crypto.randomUUID();
-        const createFleetCommand = new CreateFleetCommand(fleetId, fleetName);
+        const createFleetCommand = new CreateFleetCommand(fleetId, fleetName, userId);
         const fleetCreator = new FleetCreator(new InFileFleetRepository(), new InFileEventBus());
         const createFleetHandler = new CreateFleetCommandHandler(fleetCreator);
         createFleetHandler.handle(createFleetCommand);
         this.fleetId = fleetId;
+        this.userId = userId;
     }
 
     createVehicle(vehicleName: string): void {
@@ -86,7 +93,8 @@ export class FleetTestContext {
 
     createOtherUserFleet(): void {
         const fleetId = crypto.randomUUID();
-        const createFleetCommand = new CreateFleetCommand(fleetId, "My other user fleet");
+        const userId = this.createUser();
+        const createFleetCommand = new CreateFleetCommand(fleetId, "My other user fleet", userId);
         const fleetCreator = new FleetCreator(new InFileFleetRepository(), new InFileEventBus());
         const createFleetHandler = new CreateFleetCommandHandler(fleetCreator);
         createFleetHandler.handle(createFleetCommand);
@@ -154,5 +162,16 @@ export class FleetTestContext {
         const vehicle = findVehicleQueryHandler.find(findVehicleQuery);
 
         return vehicle.isAtLocation(this.location);
+    }
+
+    private createUser() {
+        const userId = crypto.randomUUID();
+        const userName = "Fulll";
+        const createUserCommand = new CreateUserCommand(userId, userName);
+        const userCreator = new UserCreator(new InFileUserRepository(), new InFileEventBus());
+        const createUserCommandHandler = new CreateUserCommandHandler(userCreator);
+        createUserCommandHandler.handle(createUserCommand);
+
+        return userId;
     }
 }

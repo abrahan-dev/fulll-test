@@ -3,6 +3,7 @@ import type {CreateFleetCommand} from "./CreateFleetCommand.ts";
 import type {FleetCreator} from "./FleetCreator.ts";
 import {FleetId} from "../../Domain/ValueObject/FleetId.ts";
 import {FleetName} from "../../Domain/ValueObject/FleetName.ts";
+import {UserId} from "../../../User/Domain/ValueObject/UserId.ts";
 
 export class CreateFleetCommandHandler implements CommandHandler {
     constructor(private readonly creator: FleetCreator) {}
@@ -10,7 +11,8 @@ export class CreateFleetCommandHandler implements CommandHandler {
     handle(command: CreateFleetCommand): void {
         const id = new FleetId(command.getId());
         const name = new FleetName(command.getName());
+        const userId = new UserId(command.getUserId());
 
-        this.creator.run(id, name);
+        this.creator.run(id, name, userId);
     }
 }
