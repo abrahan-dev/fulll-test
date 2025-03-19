@@ -21,6 +21,7 @@
     "test:bdd": "cucumber-js --format @cucumber/pretty-formatter"
   },
   "dependencies": {
+    "commander": "^13.1.0",
     "tsx": "^4.19.3"
   }
 }

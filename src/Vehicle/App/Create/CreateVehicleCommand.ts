@@ -1,14 +1,14 @@
 export class CreateVehicleCommand {
     constructor(
         private readonly id: string,
-        private readonly name: string
+        private readonly plateNumber: string
     ) {}
 
     getId(): string {
         return this.id;
     }
 
-    getName(): string {
-        return this.name;
+    getPlateNumber(): string {
+        return this.plateNumber;
     }
 }

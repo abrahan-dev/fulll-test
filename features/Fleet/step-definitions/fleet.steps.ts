@@ -15,7 +15,8 @@ Given(/^my fleet$/, function () {
 });
 
 Given(/^a vehicle$/, function () {
-    this.context.createVehicle("My vehicle");
+    const randomPlate = `XX-${Math.floor(100 + Math.random() * 900)}-${String.fromCharCode(65 + Math.floor(Math.random() * 26))}${String.fromCharCode(65 + Math.floor(Math.random() * 26))}`;
+    this.context.createVehicle(randomPlate);
 });
 
 When(/^I register this vehicle into my fleet$/, function () {

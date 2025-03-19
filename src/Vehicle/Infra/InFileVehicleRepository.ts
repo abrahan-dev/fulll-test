@@ -4,6 +4,7 @@ import {fileURLToPath} from "node:url";
 import type {VehicleRepository} from "../Domain/VehicleRepository.ts";
 import type {VehicleId} from "../Domain/ValueObject/VehicleId.ts";
 import { Vehicle } from "../Domain/Vehicle.ts";
+import type {VehiclePlateNumber} from "../Domain/ValueObject/VehiclePlateNumber.ts";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -12,12 +13,12 @@ export class InFileVehicleRepository implements VehicleRepository {
     private static readonly FILE_PATH = path.resolve(__dirname, "../../../features/database/");
 
     save(vehicle: Vehicle): void {
-        const filePath = this.fileName(vehicle.getId().getValue());
+        const filePath = this.fileName(vehicle.getPlateNumber().getValue());
         fs.writeFileSync(filePath, JSON.stringify(vehicle, null, 2));
     }
 
-    search(id: VehicleId): Vehicle | null {
-        const filePath = this.fileName(id.getValue());
+    search(plateNumber: VehiclePlateNumber): Vehicle | null {
+        const filePath = this.fileName(plateNumber.getValue());
 
         if (!fs.existsSync(filePath)) {
             return null;
@@ -28,13 +29,14 @@ export class InFileVehicleRepository implements VehicleRepository {
 
         return Vehicle.fromPrimitives({
             id: vehicleData.id.value,
-            name: vehicleData.name.value,
+            plateNumber: vehicleData.plateNumber.value,
             longitude: vehicleData.location?.coordinates[0],
-            latitude: vehicleData.location?.coordinates[1]
+            latitude: vehicleData.location?.coordinates[1],
+            altitude: vehicleData.location?.coordinates[2],
         })
     }
 
-    private fileName(eventId: string): string {
-        return path.join(InFileVehicleRepository.FILE_PATH, `${eventId}.vehicle.json`);
+    private fileName(plateNumber: string): string {
+        return path.join(InFileVehicleRepository.FILE_PATH, `${plateNumber}.vehicle.json`);
     }
 }

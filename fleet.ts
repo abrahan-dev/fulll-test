@@ -1,0 +1,142 @@
+import { Command } from 'commander';
+import {CreateFleetCommand} from "./src/Fleet/App/Create/CreateFleetCommand.ts";
+import {FleetCreator} from "./src/Fleet/App/Create/FleetCreator.ts";
+import {InFileFleetRepository} from "./src/Fleet/Infra/InFileFleetRepository.ts";
+import {InFileEventBus} from "./src/shared/Infra/Bus/Event/InFileEventBus.ts";
+import {CreateFleetCommandHandler} from "./src/Fleet/App/Create/CreateFleetCommandHandler.ts";
+import {CreateUserCommand} from "./src/User/App/Create/CreateUserCommand.ts";
+import {UserCreator} from "./src/User/App/Create/UserCreator.ts";
+import {InFileUserRepository} from "./src/User/Infra/InFileUserRepository.ts";
+import {CreateUserCommandHandler} from "./src/User/App/Create/CreateUserCommandHandler.ts";
+import {UserAlreadyExists} from "./src/User/Domain/UserAlreadyExists.ts";
+import {RegisterVehicleToFleetCommand} from "./src/Fleet/App/Register/RegisterVehicleToFleetCommand.ts";
+import {InFileVehicleRepository} from "./src/Vehicle/Infra/InFileVehicleRepository.ts";
+import {FleetVehicleRegisterer} from "./src/Fleet/App/Register/FleetVehicleRegisterer.ts";
+import {RegisterVehicleToFleetCommandHandler} from "./src/Fleet/App/Register/RegisterVehicleToFleetCommandHandler.ts";
+import {VehicleFinder} from "./src/Vehicle/App/Find/VehicleFinder.ts";
+import {CreateVehicleCommand} from "./src/Vehicle/App/Create/CreateVehicleCommand.ts";
+import {VehicleCreator} from "./src/Vehicle/App/Create/VehicleCreator.ts";
+import {CreateVehicleCommandHandler} from "./src/Vehicle/App/Create/CreateVehicleCommandHandler.ts";
+import {VehicleAlreadyExists} from "./src/Vehicle/Domain/VehicleAlreadyExists.ts";
+import {ParkVehicleCommand} from "./src/Vehicle/App/Park/ParkVehicleCommand.ts";
+import {ParkVehicleCommandHandler} from "./src/Vehicle/App/Park/ParkVehicleCommandHandler.ts";
+import {ParkingValet} from "./src/Vehicle/App/Park/ParkingValet.ts";
+import {VehicleAlreadyParkedAtLocation} from "./src/Vehicle/Domain/VehicleAlreadyParkedAtLocation.ts";
+import {FindFleetQuery} from "./src/Fleet/App/Find/FindFleetQuery.ts";
+import {FleetFinder} from "./src/Fleet/App/Find/FleetFinder.ts";
+import {FindFleetQueryHandler} from "./src/Fleet/App/Find/FindFleetQueryHandler.ts";
+import {FleetNotFound} from "./src/Fleet/Domain/FleetNotFound.ts";
+
+const program = new Command();
+
+function createUser(userId: string): void {
+    try {
+        const userName = "Fulll";
+        const createUserCommand = new CreateUserCommand(userId, userName);
+        const userCreator = new UserCreator(new InFileUserRepository(), new InFileEventBus());
+        const createUserCommandHandler = new CreateUserCommandHandler(userCreator);
+        createUserCommandHandler.handle(createUserCommand);
+    } catch (error) {
+        if (error instanceof UserAlreadyExists) {
+            console.log(`User with id ${userId} already exists`);
+        }
+    }
+}
+
+async function ensuresFleetExists(fleetId: string): Promise<void> {
+    const findFleetQuery = new FindFleetQuery(fleetId);
+    const fleetFinder = new FleetFinder(new InFileFleetRepository());
+    const findFleetQueryHandler = new FindFleetQueryHandler(fleetFinder);
+    await findFleetQueryHandler.handle(findFleetQuery);
+}
+
+function createVehicle(vehiclePlateNumber: string): void {
+    try {
+        const vehicleId = crypto.randomUUID();
+        const createVehicleCommand = new CreateVehicleCommand(vehicleId, vehiclePlateNumber);
+        const vehicleCreator = new VehicleCreator(new InFileVehicleRepository(), new InFileEventBus());
+        const createVehicleCommandHandler = new CreateVehicleCommandHandler(vehicleCreator);
+        createVehicleCommandHandler.handle(createVehicleCommand);
+    } catch (error) {
+        if (error instanceof VehicleAlreadyExists) {
+            console.log(`Vehicle with plate number ${vehiclePlateNumber} already exists`);
+        }
+    }
+}
+
+function createFleet(userId: string, fleetName: string = 'New Fleet'): string {
+    const fleetId = crypto.randomUUID();
+    const createFleetCommand = new CreateFleetCommand(fleetId, fleetName, userId);
+    const fleetCreator = new FleetCreator(new InFileFleetRepository(), new InFileEventBus());
+    const createFleetHandler = new CreateFleetCommandHandler(fleetCreator);
+    createFleetHandler.handle(createFleetCommand);
+    return fleetId;
+}
+
+program
+    .command('create <userId>')
+    .description('Create a fleet')
+    .action((userId: string) => {
+        createUser(userId);
+        const fleetId = createFleet(userId);
+        console.log(fleetId);
+    });
+
+program
+    .command('register-vehicle <fleetId> <vehiclePlateNumber>')
+    .description('Register a vehicle to the fleet')
+    .action(async (fleetId: string, vehiclePlateNumber: string) => {
+        createVehicle(vehiclePlateNumber);
+        const registerVehicleCommand = new RegisterVehicleToFleetCommand(fleetId, vehiclePlateNumber);
+        const fleetVehicleRegisterer = new FleetVehicleRegisterer(new InFileFleetRepository(), new InFileEventBus());
+        const vehicleFinder = new VehicleFinder(new InFileVehicleRepository());
+        const fleetVehicleRegisterCommandHandler = new RegisterVehicleToFleetCommandHandler(fleetVehicleRegisterer, vehicleFinder);
+
+        try {
+            await fleetVehicleRegisterCommandHandler.handle(registerVehicleCommand);
+        } catch (error) {
+            if (error instanceof FleetNotFound) {
+                console.error(`Fleet with id ${fleetId} not found`);
+                return;
+            }
+        }
+
+        console.log(`Vehicle with plate number ${vehiclePlateNumber} registered to fleet ${fleetId}`);
+    });
+
+program
+    .command('localize-vehicle <fleetId> <vehiclePlateNumber> <lat> <lng> [alt]')
+    .description('Localize a vehicle')
+    .allowUnknownOption(true)
+    .action(async (fleetId: string, vehiclePlateNumber: string, lat: string, lng: string, alt: string = '0') => {
+        const latitude = parseFloat(lat);
+        const longitude = parseFloat(lng);
+        const altitude = parseFloat(alt);
+
+        if (isNaN(latitude) || isNaN(longitude) || isNaN(altitude)) {
+            console.error("Invalid coordinates: lat, lng, and alt must be numbers.");
+            return;
+        }
+
+        try {
+            await ensuresFleetExists(fleetId);
+        } catch (error) {
+            if (error instanceof FleetNotFound) {
+                console.error(`Fleet with id ${fleetId} not found`);
+                return;
+            }
+        }
+
+        const parkVehicleCommand = new ParkVehicleCommand(vehiclePlateNumber, latitude, longitude, altitude);
+        const parkVehicleCommandHandler = new ParkVehicleCommandHandler(new ParkingValet(new InFileVehicleRepository(), new InFileEventBus()));
+
+        try {
+            parkVehicleCommandHandler.handle(parkVehicleCommand);
+        } catch (error: unknown) {
+            if (error instanceof VehicleAlreadyParkedAtLocation) {
+                console.warn(`Vehicle with id ${vehiclePlateNumber} is already parked at this location`);
+            }
+        }
+    });
+
+program.parse(process.argv);

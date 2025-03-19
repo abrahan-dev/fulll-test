@@ -28,13 +28,15 @@ import {CreateUserCommand} from "../../../src/User/App/Create/CreateUserCommand.
 import {UserCreator} from "../../../src/User/App/Create/UserCreator.ts";
 import {InFileUserRepository} from "../../../src/User/Infra/InFileUserRepository.ts";
 import {CreateUserCommandHandler} from "../../../src/User/App/Create/CreateUserCommandHandler.ts";
+import {FindFleetQuery} from "../../../src/Fleet/App/Find/FindFleetQuery.ts";
+import {FindFleetQueryHandler} from "../../../src/Fleet/App/Find/FindFleetQueryHandler.ts";
 
 export class FleetTestContext {
     constructor(
         public fleetId: string | null = null,
         public userId: string | null = null,
-        public vehicleId: string | null = null,
-        public vehicleIdAlreadyRegistered: boolean = false,
+        public plateNumber: string | null = null,
+        public vehicleAlreadyRegistered: boolean = false,
         public vehicleAlreadyParkedAtLocation: boolean = false,
         public otherUserFleetId: string | null = null,
         public location: GeoLocation | null = null,
@@ -51,35 +53,35 @@ export class FleetTestContext {
         this.userId = userId;
     }
 
-    createVehicle(vehicleName: string): void {
+    createVehicle(plateNumber: string): void {
         const vehicleId = crypto.randomUUID();
-        this.handleVehicleCreation(vehicleId, vehicleName);
-        this.vehicleId = vehicleId;
+        this.handleVehicleCreation(vehicleId, plateNumber);
+        this.plateNumber = plateNumber;
     }
 
     async registerVehicleToFleet(): Promise<void> {
-        if (!this.vehicleId || !this.fleetId) {
+        if (!this.plateNumber || !this.fleetId) {
             throw new Error("Vehicle or Fleet is missing from context");
         }
 
         try {
-            const registerVehicleToFleetCommand = new RegisterVehicleToFleetCommand(this.fleetId, this.vehicleId);
+            const registerVehicleToFleetCommand = new RegisterVehicleToFleetCommand(this.fleetId, this.plateNumber);
             const fleetVehicleRegisterer = new FleetVehicleRegisterer(new InFileFleetRepository(), new InFileEventBus());
             const vehicleFinder = new VehicleFinder(new InFileVehicleRepository());
             const registerVehicleToFleetCommandHandler = new RegisterVehicleToFleetCommandHandler(fleetVehicleRegisterer, vehicleFinder);
             await registerVehicleToFleetCommandHandler.handle(registerVehicleToFleetCommand);
         } catch (error: unknown) {
             if (error instanceof VehicleAlreadyRegisteredInFleet) {
-                this.vehicleIdAlreadyRegistered = true;
+                this.vehicleAlreadyRegistered = true;
             }
         }
     }
 
     async isVehicleInFleet(): Promise<boolean> {
-        if (!this.vehicleId || !this.fleetId) {
+        if (!this.plateNumber || !this.fleetId) {
             throw new Error("Vehicle or Fleet is missing from context");
         }
-        const findVehicleInFleetQuery = new FindVehicleInFleetQuery(this.vehicleId, this.fleetId);
+        const findVehicleInFleetQuery = new FindVehicleInFleetQuery(this.plateNumber, this.fleetId);
         const vehicleFinder = new VehicleFinder(new InFileVehicleRepository());
         const fleetFinder = new FleetFinder(new InFileFleetRepository());
         const findVehicleInFleetQueryHandler = new FindVehicleInFleetQueryHandler(vehicleFinder, fleetFinder);
@@ -102,11 +104,11 @@ export class FleetTestContext {
     }
 
     async registerVehicleToOtherFleet(): Promise<void> {
-        if (!this.otherUserFleetId || !this.vehicleId) {
+        if (!this.otherUserFleetId || !this.plateNumber) {
             throw new Error("Other user fleet or vehicle is missing from context");
         }
 
-        const registerVehicleToFleetCommand = new RegisterVehicleToFleetCommand(this.otherUserFleetId, this.vehicleId);
+        const registerVehicleToFleetCommand = new RegisterVehicleToFleetCommand(this.otherUserFleetId, this.plateNumber);
         const fleetVehicleRegisterer = new FleetVehicleRegisterer(new InFileFleetRepository(), new InFileEventBus());
         const vehicleFinder = new VehicleFinder(new InFileVehicleRepository());
         const registerVehicleToFleetCommandHandler = new RegisterVehicleToFleetCommandHandler(fleetVehicleRegisterer, vehicleFinder);
@@ -114,15 +116,15 @@ export class FleetTestContext {
     }
 
     get isCurrentVehicleAlreadyRegisteredInFleet(): boolean {
-        return this.vehicleIdAlreadyRegistered;
+        return this.vehicleAlreadyRegistered;
     }
 
     get isCurrentVehicleAlreadyParkedAtCurrentLocation(): boolean {
         return this.vehicleAlreadyParkedAtLocation;
     }
 
-    private handleVehicleCreation(vehicleId: string, vehicleName: string): void {
-        const createVehicleCommand = new CreateVehicleCommand(vehicleId, vehicleName);
+    private handleVehicleCreation(vehicleId: string, vehiclePlateNumber: string): void {
+        const createVehicleCommand = new CreateVehicleCommand(vehicleId, vehiclePlateNumber);
         const vehicleCreator = new VehicleCreator(new InFileVehicleRepository(), new InFileEventBus());
         const createVehicleCommandHandler = new CreateVehicleCommandHandler(vehicleCreator);
         createVehicleCommandHandler.handle(createVehicleCommand);
@@ -134,12 +136,17 @@ export class FleetTestContext {
         return this.location;
     }
 
-    parkVehicleAtLocation() {
-        if (!this.vehicleId || !this.location) {
+    async parkVehicleAtLocation() {
+        if (!this.plateNumber || !this.location || !this.fleetId) {
             throw new Error("Vehicle or location is missing from context");
         }
 
-        const parkVehicleCommand = new ParkVehicleCommand(this.vehicleId, this.location.getLatitude(), this.location.getLongitude());
+        const findFleetQuery = new FindFleetQuery(this.fleetId);
+        const fleetFinder = new FleetFinder(new InFileFleetRepository());
+        const findFleetQueryHandler = new FindFleetQueryHandler(fleetFinder);
+        await findFleetQueryHandler.handle(findFleetQuery);
+
+        const parkVehicleCommand = new ParkVehicleCommand(this.plateNumber, this.location.getLatitude(), this.location.getLongitude(), this.location.getAltitude());
         const parkVehicleCommandHandler = new ParkVehicleCommandHandler(new ParkingValet(new InFileVehicleRepository(), new InFileEventBus()));
 
         try {
@@ -152,11 +159,11 @@ export class FleetTestContext {
     }
 
     isVehicleParkedAtLocation(): boolean {
-        if (!this.vehicleId || !this.location) {
+        if (!this.plateNumber || !this.location) {
             throw new Error("Vehicle or location is missing from context");
         }
 
-        const findVehicleQuery = new FindVehicleQuery(this.vehicleId);
+        const findVehicleQuery = new FindVehicleQuery(this.plateNumber);
         const vehicleFinder = new VehicleFinder(new InFileVehicleRepository());
         const findVehicleQueryHandler = new FindVehicleQueryHandler(vehicleFinder);
         const vehicle = findVehicleQueryHandler.find(findVehicleQuery);

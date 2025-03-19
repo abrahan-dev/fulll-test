@@ -3,6 +3,7 @@ import type {UserRepository} from "../../Domain/UserRepository.ts";
 import {User} from "../../Domain/User.ts";
 import type {UserId} from "../../Domain/ValueObject/UserId.ts";
 import type {UserName} from "../../Domain/ValueObject/UserName.ts";
+import {UserAlreadyExists} from "../../Domain/UserAlreadyExists.ts";
 
 export class UserCreator {
     constructor(
@@ -11,6 +12,12 @@ export class UserCreator {
     ) {}
 
     run(id: UserId, name: UserName): void {
+        const existingUser = this.repository.search(id);
+
+        if (existingUser) {
+            throw new UserAlreadyExists(`User with id ${id} already exists`);
+        }
+
         const user = User.create(id, name);
 
         this.repository.save(user);

@@ -1,6 +1,6 @@
 import {AggregateRoot} from "../../shared/Domain/Aggregate/AggregateRoot.ts";
 import {VehicleId} from "./ValueObject/VehicleId.ts";
-import {VehicleName} from "./ValueObject/VehicleName.ts";
+import {VehiclePlateNumber} from "./ValueObject/VehiclePlateNumber.ts";
 import {VehicleCreatedDomainEvent} from "./VehicleCreatedDomainEvent.ts";
 import {GeoLocation} from "../../shared/Domain/ValueObject/GeoLocation.ts";
 import {VehicleParkedDomainEvent} from "./VehicleParkedDomainEvent.ts";
@@ -9,16 +9,16 @@ import {VehicleAlreadyParkedAtLocation} from "./VehicleAlreadyParkedAtLocation.t
 export class Vehicle extends AggregateRoot {
     constructor(
         private readonly id: VehicleId,
-        private name: VehicleName,
+        private plateNumber: VehiclePlateNumber,
         private location?: GeoLocation
     ) {
         super();
     }
 
-    static create(id: VehicleId, name: VehicleName): Vehicle {
-        const vehicle = new Vehicle(id, name);
+    static create(id: VehicleId, plateNumber: VehiclePlateNumber): Vehicle {
+        const vehicle = new Vehicle(id, plateNumber);
 
-        vehicle.record(new VehicleCreatedDomainEvent(id.getValue(), name.getValue()));
+        vehicle.record(new VehicleCreatedDomainEvent(id.getValue(), plateNumber.getValue()));
 
         return vehicle;
     }
@@ -27,12 +27,8 @@ export class Vehicle extends AggregateRoot {
         return this.id;
     }
 
-    getName(): VehicleName {
-        return this.name;
-    }
-
-    rename(newName: VehicleName): void {
-        this.name = newName;
+    getPlateNumber(): VehiclePlateNumber {
+        return this.plateNumber;
     }
 
     park(location: GeoLocation) {
@@ -40,17 +36,17 @@ export class Vehicle extends AggregateRoot {
             throw new VehicleAlreadyParkedAtLocation(this.id, this.location);
         }
         this.location = location;
-        this.record(new VehicleParkedDomainEvent(this.id.getValue(), location.getLatitude(), this.location.getLongitude()));
+        this.record(new VehicleParkedDomainEvent(this.id.getValue(), location.getLatitude(), this.location.getLongitude(), this.location.getAltitude()));
     }
 
-    static fromPrimitives(data: {id: string, name: string, longitude?: number, latitude?: number}): Vehicle {
+    static fromPrimitives(data: {id: string, plateNumber: string, longitude?: number, latitude?: number, altitude?: number}): Vehicle {
         if (!data.longitude || !data.latitude) {
-            return new Vehicle(new VehicleId(data.id), new VehicleName(data.name));
+            return new Vehicle(new VehicleId(data.id), new VehiclePlateNumber(data.plateNumber));
         }
 
-        const location = new GeoLocation(data.longitude, data.latitude)
+        const location = new GeoLocation(data.longitude, data.latitude, data.altitude);
 
-        return new Vehicle(new VehicleId(data.id), new VehicleName(data.name), location);
+        return new Vehicle(new VehicleId(data.id), new VehiclePlateNumber(data.plateNumber), location);
     }
 
     isAtLocation(location: GeoLocation) {

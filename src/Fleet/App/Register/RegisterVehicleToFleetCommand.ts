@@ -1,14 +1,14 @@
 export class RegisterVehicleToFleetCommand {
     constructor(
         private readonly fleetId: string,
-        private readonly vehicleId: string
+        private readonly plateNumber: string
     ) {}
 
     getFleetId(): string {
         return this.fleetId;
     }
 
-    getVehicleId(): string {
-        return this.vehicleId;
+    getPlateNumber(): string {
+        return this.plateNumber;
     }
 }

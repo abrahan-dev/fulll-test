@@ -1,12 +1,13 @@
 export class ParkVehicleCommand {
     constructor(
-        private readonly id: string,
+        private readonly plateNumber: string,
         private readonly latitude: number,
-        private readonly longitude: number
+        private readonly longitude: number,
+        private readonly altitude?: number
     ) {}
 
-    getId(): string {
-        return this.id;
+    getPlateNumber(): string {
+        return this.plateNumber;
     }
 
     getLatitude(): number {
@@ -15,5 +16,9 @@ export class ParkVehicleCommand {
 
     getLongitude(): number {
         return this.longitude;
+    }
+    
+    getAltitude(): number | undefined {
+        return this.altitude;
     }
 }

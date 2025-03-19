@@ -5,6 +5,7 @@ export class VehicleParkedDomainEvent extends DomainEvent {
         id: string,
         private readonly latitude: number,
         private readonly longitude: number,
+        private readonly altitude?: number,
         eventId?: string,
         occurredOn?: string
     ) {
@@ -16,7 +17,7 @@ export class VehicleParkedDomainEvent extends DomainEvent {
     }
 
     fromPrimitives(aggregateId: string, body: Record<string, unknown>, eventId: string, occurredOn: string): DomainEvent {
-        return new VehicleParkedDomainEvent(aggregateId, body["latitude"] as number, body["longitude"] as number, eventId, occurredOn);
+        return new VehicleParkedDomainEvent(aggregateId, body["latitude"] as number, body["longitude"] as number, body["altitude"] as number, eventId, occurredOn);
     }
 
     toPrimitives(): Record<string, unknown> {
@@ -24,6 +25,7 @@ export class VehicleParkedDomainEvent extends DomainEvent {
             id: this.getEventId(),
             latitude: this.getLatitude(),
             longitude: this.getLongitude(),
+            altitude: this.getAltitude(),
             eventId: this.getEventId(),
             occurredOn: this.getOccurredOn(),
             eventName: VehicleParkedDomainEvent.eventName(),
@@ -36,5 +38,9 @@ export class VehicleParkedDomainEvent extends DomainEvent {
 
     getLongitude(): number {
         return this.longitude;
+    }
+
+    getAltitude(): number | undefined {
+        return this.altitude;
     }
 }

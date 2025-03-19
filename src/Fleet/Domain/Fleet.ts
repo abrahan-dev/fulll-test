@@ -10,9 +10,9 @@ import {UserId} from "../../User/Domain/ValueObject/UserId.ts";
 export class Fleet extends AggregateRoot {
     constructor(
         private readonly id: FleetId,
-        private name: FleetName,
+        private readonly name: FleetName,
         private vehicles: VehicleId[] = [],
-        private userId: UserId
+        private readonly userId: UserId
     ) {
         super();
     }
@@ -27,18 +27,6 @@ export class Fleet extends AggregateRoot {
 
     getId(): FleetId {
         return this.id;
-    }
-
-    getName(): FleetName {
-        return this.name;
-    }
-
-    getUserId(): UserId {
-        return this.userId;
-    }
-
-    rename(newName: FleetName): void {
-        this.name = newName;
     }
 
     hasVehicle(vehicleId: VehicleId): boolean {
