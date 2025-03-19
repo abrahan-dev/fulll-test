@@ -28,7 +28,7 @@ export class FleetTestContext {
 
     createFleet(fleetName: string): void {
         const fleetId = crypto.randomUUID();
-        const createFleetCommand = new CreateFleetCommand(fleetId, "My fleet");
+        const createFleetCommand = new CreateFleetCommand(fleetId, fleetName);
         const fleetCreator = new FleetCreator(new InFileFleetRepository(), new InFileEventBus());
         const createFleetHandler = new CreateFleetCommandHandler(fleetCreator);
         createFleetHandler.handle(createFleetCommand);
@@ -37,7 +37,7 @@ export class FleetTestContext {
 
     createVehicle(vehicleName: string): void {
         const vehicleId = crypto.randomUUID();
-        this.handleVehicleCreation(vehicleId, "My vehicle");
+        this.handleVehicleCreation(vehicleId, vehicleName);
         this.vehicleId = vehicleId;
     }
 
