@@ -1,19 +1,19 @@
 import * as fs from "fs";
 import * as path from "path";
 import type {FleetRepository} from "../Domain/FleetRepository.ts";
-import type {Fleet} from "../Domain/Fleet.ts";
 import type {FleetId} from "../Domain/ValueObject/FleetId.ts";
 import {fileURLToPath} from "node:url";
+import { Fleet } from "../Domain/Fleet.ts";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const ROOT_DIR = path.resolve(__dirname, "../../../features/database/");
 
 export class InFileFleetRepository implements FleetRepository {
-    private static readonly FILE_PATH = path.join(ROOT_DIR, "fleets");
+    private static readonly FILE_PATH = path.resolve(__dirname, "../../../features/database/");
 
     save(fleet: Fleet): void {
-        fs.writeFileSync(this.fileName(fleet.getId().getValue()), JSON.stringify(fleet));
+        const filePath = this.fileName(fleet.getId().getValue());
+        fs.writeFileSync(filePath, JSON.stringify(fleet, null, 2));
     }
 
     search(id: FleetId): Fleet | null {
@@ -24,10 +24,16 @@ export class InFileFleetRepository implements FleetRepository {
         }
 
         const data = fs.readFileSync(filePath, "utf-8");
-        return JSON.parse(data) as Fleet;
+        const fleetData = JSON.parse(data);
+
+        return Fleet.fromPrimitives({
+            id: fleetData.id.value,
+            name: fleetData.name.value,
+            vehicles: fleetData.vehicles.map((vehicle: {value: string}) => vehicle.value)
+        })
     }
 
-    private fileName(id: string): string {
-        return `${InFileFleetRepository.FILE_PATH}.${id}.repo`;
+    private fileName(eventId: string): string {
+        return path.join(InFileFleetRepository.FILE_PATH, `${eventId}.fleet.json`);
     }
 }

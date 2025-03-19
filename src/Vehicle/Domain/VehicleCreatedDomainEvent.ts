@@ -1,9 +1,9 @@
 import {DomainEvent} from "../../shared/Domain/Bus/Event/DomainEvent.ts";
 
-export class VehicleRegisteredInFleetDomainEvent extends DomainEvent {
+export class VehicleCreatedDomainEvent extends DomainEvent {
     constructor(
         id: string,
-        private readonly fleetId: string,
+        private readonly vehicleName: string,
         eventId?: string,
         occurredOn?: string
     ) {
@@ -11,24 +11,24 @@ export class VehicleRegisteredInFleetDomainEvent extends DomainEvent {
     }
 
     static eventName(): string {
-        return "fleet.vehicle.registered";
+        return "vehicle.created";
     }
 
     fromPrimitives(aggregateId: string, body: Record<string, unknown>, eventId: string, occurredOn: string): DomainEvent {
-        return new VehicleRegisteredInFleetDomainEvent(aggregateId, body["fleetId"] as string, eventId, occurredOn);
+        return new VehicleCreatedDomainEvent(aggregateId, body["vehicleName"] as string, eventId, occurredOn);
     }
 
     toPrimitives(): Record<string, string> {
         return {
             id: this.getEventId(),
-            fleetId: this.getFleetId(),
+            vehicleName: this.getVehicleName(),
             eventId: this.getEventId(),
             occurredOn: this.getOccurredOn(),
-            eventName: VehicleRegisteredInFleetDomainEvent.eventName(),
+            eventName: VehicleCreatedDomainEvent.eventName(),
         };
     }
 
-    getFleetId(): string {
-        return this.fleetId;
+    getVehicleName(): string {
+        return this.vehicleName;
     }
 }

@@ -2,7 +2,7 @@ export abstract class DomainEvent {
     private readonly eventId: string;
     private readonly occurredOn: string;
 
-    constructor(private readonly aggregateId: string, eventId?: string, occurredOn?: string) {
+    protected constructor(private readonly aggregateId: string, eventId?: string, occurredOn?: string) {
         this.eventId = eventId ?? crypto.randomUUID();
         this.occurredOn = occurredOn ?? new Date().toISOString();
     }
