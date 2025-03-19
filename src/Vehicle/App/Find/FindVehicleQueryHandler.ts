@@ -7,7 +7,7 @@ import {VehicleId} from "../../Domain/ValueObject/VehicleId.ts";
 export class FindVehicleQueryHandler implements QueryHandler {
     constructor(private readonly finder: VehicleFinder) {}
 
-    async find(query: FindVehicleQuery): Promise<Vehicle> {
-        return await this.finder.find(new VehicleId(query.getVehicleId()));
+    find(query: FindVehicleQuery): Vehicle {
+        return this.finder.find(new VehicleId(query.getVehicleId()));
     }
 }

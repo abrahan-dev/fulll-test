@@ -17,13 +17,22 @@ import {FindVehicleInFleetQuery} from "../../../src/Fleet/App/Find/FindVehicleIn
 import {FindVehicleInFleetQueryHandler} from "../../../src/Fleet/App/Find/FindVehicleInFleetQueryHandler.ts";
 import {FleetFinder} from "../../../src/Fleet/App/Find/FleetFinder.ts";
 import {VehicleAlreadyRegisteredInFleet} from "../../../src/Fleet/Domain/VehicleAlreadyRegisteredInFleet.ts";
+import { GeoLocation } from "../../../src/shared/Domain/ValueObject/GeoLocation.ts";
+import {ParkVehicleCommand} from "../../../src/Vehicle/App/Park/ParkVehicleCommand.ts";
+import {ParkingValet} from "../../../src/Vehicle/App/Park/ParkingValet.ts";
+import {ParkVehicleCommandHandler} from "../../../src/Vehicle/App/Park/ParkVehicleCommandHandler.ts";
+import {FindVehicleQuery} from "../../../src/Vehicle/App/Find/FindVehicleQuery.ts";
+import {FindVehicleQueryHandler} from "../../../src/Vehicle/App/Find/FindVehicleQueryHandler.ts";
+import {VehicleAlreadyParkedAtLocation} from "../../../src/Vehicle/Domain/VehicleAlreadyParkedAtLocation.ts";
 
 export class FleetTestContext {
     constructor(
         public fleetId: string | null = null,
         public vehicleId: string | null = null,
         public vehicleIdAlreadyRegistered: boolean = false,
+        public vehicleAlreadyParkedAtLocation: boolean = false,
         public otherUserFleetId: string | null = null,
+        public location: GeoLocation | null = null,
     ) {}
 
     createFleet(fleetName: string): void {
@@ -100,10 +109,50 @@ export class FleetTestContext {
         return this.vehicleIdAlreadyRegistered;
     }
 
+    get isCurrentVehicleAlreadyParkedAtCurrentLocation(): boolean {
+        return this.vehicleAlreadyParkedAtLocation;
+    }
+
     private handleVehicleCreation(vehicleId: string, vehicleName: string): void {
         const createVehicleCommand = new CreateVehicleCommand(vehicleId, vehicleName);
         const vehicleCreator = new VehicleCreator(new InFileVehicleRepository(), new InFileEventBus());
         const createVehicleCommandHandler = new CreateVehicleCommandHandler(vehicleCreator);
         createVehicleCommandHandler.handle(createVehicleCommand);
+    }
+
+    createLocation(): GeoLocation {
+        this.location = GeoLocation.random();
+
+        return this.location;
+    }
+
+    parkVehicleAtLocation() {
+        if (!this.vehicleId || !this.location) {
+            throw new Error("Vehicle or location is missing from context");
+        }
+
+        const parkVehicleCommand = new ParkVehicleCommand(this.vehicleId, this.location.getLatitude(), this.location.getLongitude());
+        const parkVehicleCommandHandler = new ParkVehicleCommandHandler(new ParkingValet(new InFileVehicleRepository(), new InFileEventBus()));
+
+        try {
+            parkVehicleCommandHandler.handle(parkVehicleCommand);
+        } catch (error: unknown) {
+            if (error instanceof VehicleAlreadyParkedAtLocation) {
+                this.vehicleAlreadyParkedAtLocation = true;
+            }
+        }
+    }
+
+    isVehicleParkedAtLocation(): boolean {
+        if (!this.vehicleId || !this.location) {
+            throw new Error("Vehicle or location is missing from context");
+        }
+
+        const findVehicleQuery = new FindVehicleQuery(this.vehicleId);
+        const vehicleFinder = new VehicleFinder(new InFileVehicleRepository());
+        const findVehicleQueryHandler = new FindVehicleQueryHandler(vehicleFinder);
+        const vehicle = findVehicleQueryHandler.find(findVehicleQuery);
+
+        return vehicle.isAtLocation(this.location);
     }
 }

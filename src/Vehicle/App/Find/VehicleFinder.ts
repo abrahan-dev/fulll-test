@@ -6,7 +6,7 @@ import {VehicleNotFound} from "../../Domain/VehicleNotFound.ts";
 export class VehicleFinder {
     constructor(private readonly repository: VehicleRepository) {}
 
-    public async find(id: VehicleId): Promise<Vehicle> {
+    public find(id: VehicleId): Vehicle {
         const vehicle = this.repository.search(id);
 
         if (!vehicle) {

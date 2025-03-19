@@ -3,7 +3,7 @@ import * as path from "path";
 import {fileURLToPath} from "node:url";
 import type {VehicleRepository} from "../Domain/VehicleRepository.ts";
 import type {VehicleId} from "../Domain/ValueObject/VehicleId.ts";
-import type {Vehicle} from "../Domain/Vehicle.ts";
+import { Vehicle } from "../Domain/Vehicle.ts";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -24,7 +24,14 @@ export class InFileVehicleRepository implements VehicleRepository {
         }
 
         const data = fs.readFileSync(filePath, "utf-8");
-        return JSON.parse(data) as Vehicle;
+        const vehicleData = JSON.parse(data);
+
+        return Vehicle.fromPrimitives({
+            id: vehicleData.id.value,
+            name: vehicleData.name.value,
+            longitude: vehicleData.location?.coordinates[0],
+            latitude: vehicleData.location?.coordinates[1]
+        })
     }
 
     private fileName(eventId: string): string {
