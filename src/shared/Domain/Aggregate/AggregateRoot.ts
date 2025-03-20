@@ -1,16 +1,16 @@
-import type {DomainEvent} from "../Bus/Event/DomainEvent.ts";
+import type { DomainEvent } from "../Bus/Event/DomainEvent.ts";
 
 export class AggregateRoot {
-    private domainEvents: DomainEvent[] = [];
+  private domainEvents: DomainEvent[] = [];
 
-    pullDomainEvents(): DomainEvent[] {
-        const events = [...this.domainEvents];
-        this.domainEvents = [];
+  pullDomainEvents(): DomainEvent[] {
+    const events = [...this.domainEvents];
+    this.domainEvents = [];
 
-        return events;
-    }
+    return events;
+  }
 
-    protected record(domainEvent: DomainEvent): void {
-        this.domainEvents.push(domainEvent);
-    }
+  protected record(domainEvent: DomainEvent): void {
+    this.domainEvents.push(domainEvent);
+  }
 }

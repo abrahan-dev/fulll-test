@@ -80,3 +80,9 @@ Quality tools may include: Linting, formatting, testing, static analysis, securi
 - Once we have integrated the tools, we can create a CI/CD pipeline that runs the tests and checks the quality of the code before merging it to the main branch.
 - CI pipeline is great to catch bugs early and to make sure the code is always in a deployable state.
 - CD pipeline is great to automate the deployment process and minimize human errors.
+
+**Run the linter**
+
+```bash
+docker compose run app bun run lint
+```

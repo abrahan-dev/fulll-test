@@ -1,9 +1,9 @@
 export class StringValueObject {
-    constructor(private readonly value: string) {
-        this.value = value;
-    }
+  constructor(private readonly value: string) {
+    this.value = value;
+  }
 
-    getValue(): string {
-        return this.value;
-    }
+  getValue(): string {
+    return this.value;
+  }
 }

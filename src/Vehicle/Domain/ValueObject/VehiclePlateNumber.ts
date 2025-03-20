@@ -1,3 +1,3 @@
-import {StringValueObject} from "../../../shared/Domain/ValueObject/StringValueObject.ts";
+import { StringValueObject } from "../../../shared/Domain/ValueObject/StringValueObject.ts";
 
 export class VehiclePlateNumber extends StringValueObject {}

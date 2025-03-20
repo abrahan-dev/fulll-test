@@ -24,7 +24,8 @@
   "scripts": {
     "test": "bun test tests/Fizzbuzz",
     "build": "tsc",
-    "test:bdd": "cucumber-js --format @cucumber/pretty-formatter"
+    "test:bdd": "cucumber-js --format @cucumber/pretty-formatter",
+    "lint": "bun run eslint src/**/*.ts"
   },
   "dependencies": {
     "commander": "^13.1.0",

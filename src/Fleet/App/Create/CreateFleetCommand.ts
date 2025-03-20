@@ -1,19 +1,19 @@
 export class CreateFleetCommand {
-    constructor(
-        private readonly id: string,
-        private readonly name: string,
-        private readonly userId: string,
-    ) {}
+  constructor(
+    private readonly id: string,
+    private readonly name: string,
+    private readonly userId: string,
+  ) {}
 
-    getId(): string {
-        return this.id;
-    }
+  getId(): string {
+    return this.id;
+  }
 
-    getName(): string {
-        return this.name;
-    }
+  getName(): string {
+    return this.name;
+  }
 
-    getUserId(): string {
-        return this.userId;
-    }
+  getUserId(): string {
+    return this.userId;
+  }
 }
