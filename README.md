@@ -74,7 +74,8 @@ Quality tools may include: Linting, formatting, testing, static analysis, securi
 | **Security**        | Snyk, ESLint Security Plugin | Vulnerability detection                        |
 | **CI/CD**           | GitHub Actions, Docker       | Automate tests & deployments                   |
 
-- We can work to standardize the tools and configurations across the team. We can use .editorconfig files and other tools to enforce the standards.
+- We can work to standardize the tools and configurations across the team. 
+- We can use .editorconfig files and other tools to enforce the standards as pre-commit hooks.
 - Whenever we develop new features that involve new external APIs, libraries or new data sources we should consult security experts to make sure we are not introducing vulnerabilities.
 - Once we have integrated the tools, we can create a CI/CD pipeline that runs the tests and checks the quality of the code before merging it to the main branch.
 - CI pipeline is great to catch bugs early and to make sure the code is always in a deployable state.
