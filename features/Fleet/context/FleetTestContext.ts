@@ -52,12 +52,15 @@ export class FleetTestContext {
         public otherUserFleetId: string | null = null,
         public location: GeoLocation | null = null,
     ) {
-        // this.userRepository = new InFileUserRepository();
-        // this.fleetRepository = new InFileFleetRepository();
-        // this.vehicleRepository = new InFileVehicleRepository();
-        this.userRepository = new PostgresUserRepository();
-        this.fleetRepository = new PostgresFleetRepository();
-        this.vehicleRepository = new PostgresVehicleRepository();
+        if (useDatabase) {
+            this.userRepository = new PostgresUserRepository();
+            this.fleetRepository = new PostgresFleetRepository();
+            this.vehicleRepository = new PostgresVehicleRepository();
+        } else {
+            this.userRepository = new InFileUserRepository();
+            this.fleetRepository = new InFileFleetRepository();
+            this.vehicleRepository = new InFileVehicleRepository();
+        }
     }
 
     async createFleet(fleetName: string): Promise<void> {

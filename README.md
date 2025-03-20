@@ -11,10 +11,10 @@ docker compose up -d --build
 
 ## Part 1: FizzBuzz
 
-I have created the classic version as stated in your [Instructions](https://github.com/fulll/hiring/blob/master/Algo/fizzbuzz.md)
+I have created the classic version as stated in the [Instructions](https://github.com/fulll/hiring/blob/master/Algo/fizzbuzz.md)
 
 The code is in [src/Fizzbuzz](src/Fizzbuzz)
-The tests are in [tests/Fizzbuzz](tests/Fizzbuzz) 
+The unit tests are in [tests/Fizzbuzz](tests/Fizzbuzz) 
 
 Run tests:
 
@@ -32,15 +32,25 @@ I think guard clauses, expressive names and early returns works just fine in thi
 
 ## Backend
 
-[Instructions](https://github.com/fulll/hiring/blob/master/Backend/ddd-and-cqrs-intermediare-senior.md)
+I have created the Fleet manager, following the [Instructions](https://github.com/fulll/hiring/blob/master/Backend/ddd-and-cqrs-intermediare-senior.md)
 
-Run bdd tests:
+**Run bdd tests**
 
 ```bash
 docker compose run app run test:bdd
 ```
 
-Run the cli:
+**Connect to the database and check the data if you like**
+
+```
+user: user
+password: password
+database: fleet
+
+jdbc:postgresql://localhost:5432/fleet
+```
+
+**Run the cli**
 
 ```bash
 docker compose run app bun fleet.ts
