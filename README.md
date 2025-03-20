@@ -39,7 +39,7 @@ the [Instructions](https://github.com/fulll/hiring/blob/master/Backend/ddd-and-c
 **Run bdd tests**
 
 ```bash
-docker compose run app run test:bdd
+docker compose run app bun run test:bdd
 ```
 
 **Connect to the database and check the data if you like**
