@@ -11,8 +11,8 @@ export class VehicleCreator {
         private readonly bus: EventBus
     ) {}
 
-    create(id: VehicleId, plateNumber: VehiclePlateNumber): void {
-        const existingVehicle = this.repository.search(plateNumber);
+    async create(id: VehicleId, plateNumber: VehiclePlateNumber): Promise<void> {
+        const existingVehicle = await this.repository.search(plateNumber);
 
         if (existingVehicle) {
             throw new VehicleAlreadyExists(id, plateNumber);
@@ -20,7 +20,7 @@ export class VehicleCreator {
 
         const vehicle = Vehicle.create(id, plateNumber);
 
-        this.repository.save(vehicle);
+        await this.repository.save(vehicle);
         this.bus.publish(vehicle.pullDomainEvents());
     }
 }

@@ -12,12 +12,12 @@ const __dirname = path.dirname(__filename);
 export class InFileVehicleRepository implements VehicleRepository {
     private static readonly FILE_PATH = path.resolve(__dirname, "../../../features/database/");
 
-    save(vehicle: Vehicle): void {
+    async save(vehicle: Vehicle): Promise<void> {
         const filePath = this.fileName(vehicle.getPlateNumber().getValue());
         fs.writeFileSync(filePath, JSON.stringify(vehicle, null, 2));
     }
 
-    search(plateNumber: VehiclePlateNumber): Vehicle | null {
+    async search(plateNumber: VehiclePlateNumber): Promise<Vehicle | null> {
         const filePath = this.fileName(plateNumber.getValue());
 
         if (!fs.existsSync(filePath)) {

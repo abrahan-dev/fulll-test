@@ -1,32 +1,29 @@
 # Fulll
 
-fulll techincal tests.
+Fulll technical tests.
 
 ## Installation
 
-This project runs in [bun](https://bun.sh). Please install it first:
-
 ```bash
-curl -fsSL https://bun.sh/install | bash
+docker compose down -v
+docker compose up -d --build 
 ```
 
-To install project dependencies:
-
-```bash
-bun install
-```
-
-## FizzBuzz
+## Part 1: FizzBuzz
 
 I have created the classic version as stated in your [Instructions](https://github.com/fulll/hiring/blob/master/Algo/fizzbuzz.md)
+
+The code is in [src/Fizzbuzz](src/Fizzbuzz)
+The tests are in [tests/Fizzbuzz](tests/Fizzbuzz) 
 
 Run tests:
 
 ```bash
-bun test
+docker compose run app bun run test
 ```
 
-I have considered another versions more compact. I think guard clauses, expressive names and early returns works just fine in this particular case.
+I have considered another versions more compact.  
+I think guard clauses, expressive names and early returns works just fine in this particular case.
 
 ### Complexity
 
@@ -40,15 +37,14 @@ I have considered another versions more compact. I think guard clauses, expressi
 Run bdd tests:
 
 ```bash
-bun run test:bdd
+docker compose run app run test:bdd
 ```
 
 Run the cli:
 
 ```bash
-chmod +x ./fleet.ts
-bun fleet.ts
-bun fleet.ts create b6e2a1d4-8f3e-42d6-b9d3-5f8a3c7e4b12
-bun fleet.ts register-vehicle <fleet-id> 34-MDC-56
-bun fleet.ts localize-vehicle <fleet-id> 34-MDC-56 37.7749 -122.4194 15.7
+docker compose run app bun fleet.ts
+docker compose run app bun fleet.ts create b6e2a1d4-8f3e-42d6-b9d3-5f8a3c7e4b12
+docker compose run app bun fleet.ts register-vehicle <fleet-id> 34-MDC-56
+docker compose run app bun fleet.ts localize-vehicle <fleet-id> 34-MDC-56 37.7749 -122.4194 15.7
 ```

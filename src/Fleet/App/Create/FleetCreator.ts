@@ -11,10 +11,10 @@ export class FleetCreator {
         private readonly bus: EventBus
     ) {}
 
-    run(id: FleetId, name: FleetName, userId: UserId): void {
+    async run(id: FleetId, name: FleetName, userId: UserId): Promise<void> {
         const fleet = Fleet.create(id, name, userId);
 
-        this.repository.save(fleet);
+        await this.repository.save(fleet);
         this.bus.publish(fleet.pullDomainEvents());
     }
 }

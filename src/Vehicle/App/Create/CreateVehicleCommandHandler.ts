@@ -7,10 +7,10 @@ import {VehiclePlateNumber} from "../../Domain/ValueObject/VehiclePlateNumber.ts
 export class CreateVehicleCommandHandler implements CommandHandler {
     constructor(private readonly creator: VehicleCreator) {}
 
-    handle(command: CreateVehicleCommand): void {
+    async handle(command: CreateVehicleCommand): Promise<void> {
         const id = new VehicleId(command.getId());
         const vehiclePlateNumber = new VehiclePlateNumber(command.getPlateNumber());
 
-        this.creator.create(id, vehiclePlateNumber);
+        await this.creator.create(id, vehiclePlateNumber);
     }
 }

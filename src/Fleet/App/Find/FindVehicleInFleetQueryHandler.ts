@@ -11,7 +11,7 @@ export class FindVehicleInFleetQueryHandler implements QueryHandler {
     constructor(private readonly vehicleFinder: VehicleFinder, private readonly fleetFinder: FleetFinder) {}
 
     async handle(query: FindVehicleInFleetQuery): Promise<Vehicle> {
-        const vehicle = this.vehicleFinder.find(new VehiclePlateNumber(query.getPlateNumber()));
+        const vehicle = await this.vehicleFinder.find(new VehiclePlateNumber(query.getPlateNumber()));
         const fleet = await this.fleetFinder.find(new FleetId(query.getFleetId()));
 
         if (!fleet.hasVehicle(vehicle.getId())) {

@@ -29,13 +29,13 @@ import {FleetNotFound} from "./src/Fleet/Domain/FleetNotFound.ts";
 
 const program = new Command();
 
-function createUser(userId: string): void {
+async function createUser(userId: string): Promise<void> {
     try {
         const userName = "Fulll";
         const createUserCommand = new CreateUserCommand(userId, userName);
         const userCreator = new UserCreator(new InFileUserRepository(), new InFileEventBus());
         const createUserCommandHandler = new CreateUserCommandHandler(userCreator);
-        createUserCommandHandler.handle(createUserCommand);
+        await createUserCommandHandler.handle(createUserCommand);
     } catch (error) {
         if (error instanceof UserAlreadyExists) {
             console.log(`User with id ${userId} already exists`);
@@ -50,13 +50,13 @@ async function ensuresFleetExists(fleetId: string): Promise<void> {
     await findFleetQueryHandler.handle(findFleetQuery);
 }
 
-function createVehicle(vehiclePlateNumber: string): void {
+async function createVehicle(vehiclePlateNumber: string): Promise<void> {
     try {
         const vehicleId = crypto.randomUUID();
         const createVehicleCommand = new CreateVehicleCommand(vehicleId, vehiclePlateNumber);
         const vehicleCreator = new VehicleCreator(new InFileVehicleRepository(), new InFileEventBus());
         const createVehicleCommandHandler = new CreateVehicleCommandHandler(vehicleCreator);
-        createVehicleCommandHandler.handle(createVehicleCommand);
+        await createVehicleCommandHandler.handle(createVehicleCommand);
     } catch (error) {
         if (error instanceof VehicleAlreadyExists) {
             console.log(`Vehicle with plate number ${vehiclePlateNumber} already exists`);
@@ -64,21 +64,21 @@ function createVehicle(vehiclePlateNumber: string): void {
     }
 }
 
-function createFleet(userId: string, fleetName: string = 'New Fleet'): string {
+async function createFleet(userId: string, fleetName: string = 'New Fleet'): Promise<string> {
     const fleetId = crypto.randomUUID();
     const createFleetCommand = new CreateFleetCommand(fleetId, fleetName, userId);
     const fleetCreator = new FleetCreator(new InFileFleetRepository(), new InFileEventBus());
     const createFleetHandler = new CreateFleetCommandHandler(fleetCreator);
-    createFleetHandler.handle(createFleetCommand);
+    await createFleetHandler.handle(createFleetCommand);
     return fleetId;
 }
 
 program
     .command('create <userId>')
     .description('Create a fleet')
-    .action((userId: string) => {
-        createUser(userId);
-        const fleetId = createFleet(userId);
+    .action(async (userId: string) => {
+        await createUser(userId);
+        const fleetId = await createFleet(userId);
         console.log(fleetId);
     });
 
@@ -86,7 +86,7 @@ program
     .command('register-vehicle <fleetId> <vehiclePlateNumber>')
     .description('Register a vehicle to the fleet')
     .action(async (fleetId: string, vehiclePlateNumber: string) => {
-        createVehicle(vehiclePlateNumber);
+        await createVehicle(vehiclePlateNumber);
         const registerVehicleCommand = new RegisterVehicleToFleetCommand(fleetId, vehiclePlateNumber);
         const fleetVehicleRegisterer = new FleetVehicleRegisterer(new InFileFleetRepository(), new InFileEventBus());
         const vehicleFinder = new VehicleFinder(new InFileVehicleRepository());
@@ -131,7 +131,7 @@ program
         const parkVehicleCommandHandler = new ParkVehicleCommandHandler(new ParkingValet(new InFileVehicleRepository(), new InFileEventBus()));
 
         try {
-            parkVehicleCommandHandler.handle(parkVehicleCommand);
+            await parkVehicleCommandHandler.handle(parkVehicleCommand);
         } catch (error: unknown) {
             if (error instanceof VehicleAlreadyParkedAtLocation) {
                 console.warn(`Vehicle with id ${vehiclePlateNumber} is already parked at this location`);

@@ -7,10 +7,10 @@ import type {UserCreator} from "./UserCreator.ts";
 export class CreateUserCommandHandler implements CommandHandler {
     constructor(private readonly creator: UserCreator) {}
 
-    handle(command: CreateUserCommand): void {
+    async handle(command: CreateUserCommand): Promise<void> {
         const id = new UserId(command.getId());
         const name = new UserName(command.getName());
 
-        this.creator.run(id, name);
+        await this.creator.run(id, name);
     }
 }

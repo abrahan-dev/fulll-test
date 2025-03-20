@@ -7,7 +7,7 @@ export class FleetFinder {
     constructor(private readonly repository: FleetRepository) {}
 
     public async find(fleetId: FleetId): Promise<Fleet> {
-        const fleet = this.repository.search(fleetId);
+        const fleet = await this.repository.search(fleetId);
 
         if (!fleet) {
             throw new FleetNotFound(fleetId);

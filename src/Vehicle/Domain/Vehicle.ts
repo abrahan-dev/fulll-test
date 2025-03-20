@@ -35,6 +35,7 @@ export class Vehicle extends AggregateRoot {
         if (this.isAtLocation(location) && this.location) {
             throw new VehicleAlreadyParkedAtLocation(this.id, this.location);
         }
+
         this.location = location;
         this.record(new VehicleParkedDomainEvent(this.id.getValue(), location.getLatitude(), this.location.getLongitude(), this.location.getAltitude()));
     }
@@ -51,5 +52,9 @@ export class Vehicle extends AggregateRoot {
 
     isAtLocation(location: GeoLocation) {
         return this.location ? this.location.equals(location) : false;
+    }
+
+    getLocation() {
+        return this.location;
     }
 }

@@ -11,7 +11,7 @@ export class RegisterVehicleToFleetCommandHandler implements CommandHandler {
     async handle(command: RegisterVehicleToFleetCommand): Promise<void> {
         const fleetId = new FleetId(command.getFleetId());
         const plateNumber = new VehiclePlateNumber(command.getPlateNumber());
-        const vehicle = this.vehicleFinder.find(plateNumber);
-        this.registerer.register(fleetId, vehicle.getId());
+        const vehicle = await this.vehicleFinder.find(plateNumber);
+        await this.registerer.register(fleetId, vehicle.getId());
     }
 }

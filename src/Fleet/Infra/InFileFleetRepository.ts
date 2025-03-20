@@ -11,12 +11,12 @@ const __dirname = path.dirname(__filename);
 export class InFileFleetRepository implements FleetRepository {
     private static readonly FILE_PATH = path.resolve(__dirname, "../../../features/database/");
 
-    save(fleet: Fleet): void {
+    async save(fleet: Fleet): Promise<void> {
         const filePath = this.fileName(fleet.getId().getValue());
         fs.writeFileSync(filePath, JSON.stringify(fleet, null, 2));
     }
 
-    search(id: FleetId): Fleet | null {
+    async search(id: FleetId): Promise<Fleet | null> {
         const filePath = this.fileName(id.getValue());
 
         if (!fs.existsSync(filePath)) {

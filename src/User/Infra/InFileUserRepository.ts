@@ -11,12 +11,12 @@ const __dirname = path.dirname(__filename);
 export class InFileUserRepository implements UserRepository {
     private static readonly FILE_PATH = path.resolve(__dirname, "../../../features/database/");
 
-    save(user: User): void {
+    async save(user: User): Promise<void> {
         const filePath = this.fileName(user.getId().getValue());
         fs.writeFileSync(filePath, JSON.stringify(user, null, 2));
     }
 
-    search(id: UserId): User | null {
+    async search(id: UserId): Promise<User | null> {
         const filePath = this.fileName(id.getValue());
 
         if (!fs.existsSync(filePath)) {

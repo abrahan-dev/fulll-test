@@ -10,15 +10,15 @@ export class FleetVehicleRegisterer {
         private readonly bus: EventBus
     ) {}
 
-    register(fleetId: FleetId, vehicleId: VehicleId): void {
-        const fleet = this.repository.search(fleetId);
+    async register(fleetId: FleetId, vehicleId: VehicleId): Promise<void> {
+        const fleet = await this.repository.search(fleetId);
 
         if (!fleet) {
             throw new FleetNotFound(fleetId);
         }
 
         fleet.registerVehicle(vehicleId);
-        this.repository.save(fleet);
+        await this.repository.save(fleet);
         this.bus.publish(fleet.pullDomainEvents());
     }
 }

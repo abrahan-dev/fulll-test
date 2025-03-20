@@ -7,10 +7,10 @@ import {VehiclePlateNumber} from "../../Domain/ValueObject/VehiclePlateNumber.ts
 export class ParkVehicleCommandHandler implements CommandHandler {
     constructor(private readonly parkingValet: ParkingValet) {}
 
-    handle(command: ParkVehicleCommand): void {
+    async handle(command: ParkVehicleCommand): Promise<void> {
         const plateNumber = new VehiclePlateNumber(command.getPlateNumber());
         const location = new GeoLocation(command.getLongitude(), command.getLatitude(), command.getAltitude());
 
-        this.parkingValet.park(plateNumber, location);
+        await this.parkingValet.park(plateNumber, location);
     }
 }

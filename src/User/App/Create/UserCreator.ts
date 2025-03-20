@@ -11,8 +11,8 @@ export class UserCreator {
         private readonly bus: EventBus
     ) {}
 
-    run(id: UserId, name: UserName): void {
-        const existingUser = this.repository.search(id);
+    async run(id: UserId, name: UserName): Promise<void> {
+        const existingUser = await this.repository.search(id);
 
         if (existingUser) {
             throw new UserAlreadyExists(`User with id ${id} already exists`);
@@ -20,7 +20,7 @@ export class UserCreator {
 
         const user = User.create(id, name);
 
-        this.repository.save(user);
+        await this.repository.save(user);
         this.bus.publish(user.pullDomainEvents());
     }
 }

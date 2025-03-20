@@ -8,11 +8,11 @@ import {UserId} from "../../../User/Domain/ValueObject/UserId.ts";
 export class CreateFleetCommandHandler implements CommandHandler {
     constructor(private readonly creator: FleetCreator) {}
 
-    handle(command: CreateFleetCommand): void {
+    async handle(command: CreateFleetCommand): Promise<void> {
         const id = new FleetId(command.getId());
         const name = new FleetName(command.getName());
         const userId = new UserId(command.getUserId());
 
-        this.creator.run(id, name, userId);
+        await this.creator.run(id, name, userId);
     }
 }

@@ -1,8 +1,6 @@
 import type {EventBus} from "../../../shared/Domain/Bus/Event/EventBus.ts";
 import type {VehicleRepository} from "../../Domain/VehicleRepository.ts";
-import type {VehicleId} from "../../Domain/ValueObject/VehicleId.ts";
 import type {VehiclePlateNumber} from "../../Domain/ValueObject/VehiclePlateNumber.ts";
-import {Vehicle} from "../../Domain/Vehicle.ts";
 import type {GeoLocation} from "../../../shared/Domain/ValueObject/GeoLocation.ts";
 import {VehicleNotFound} from "../../Domain/VehicleNotFound.ts";
 
@@ -12,15 +10,15 @@ export class ParkingValet {
         private readonly bus: EventBus
     ) {}
 
-    park(plateNumber: VehiclePlateNumber, location: GeoLocation): void {
-        const vehicle = this.repository.search(plateNumber);
+    async park(plateNumber: VehiclePlateNumber, location: GeoLocation): Promise<void> {
+        const vehicle = await this.repository.search(plateNumber);
 
         if (!vehicle) {
             throw new VehicleNotFound(plateNumber);
         }
 
         vehicle.park(location);
-        this.repository.save(vehicle);
+        await this.repository.save(vehicle);
         this.bus.publish(vehicle.pullDomainEvents());
     }
 }

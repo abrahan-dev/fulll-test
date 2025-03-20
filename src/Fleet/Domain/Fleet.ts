@@ -29,6 +29,18 @@ export class Fleet extends AggregateRoot {
         return this.id;
     }
 
+    getName(): FleetName {
+        return this.name;
+    }
+
+    getUserId(): UserId {
+        return this.userId;
+    }
+
+    getVehicles(): VehicleId[] {
+        return this.vehicles;
+    }
+
     hasVehicle(vehicleId: VehicleId): boolean {
         return this.vehicles.some((id) => id.equals(vehicleId));
     }
